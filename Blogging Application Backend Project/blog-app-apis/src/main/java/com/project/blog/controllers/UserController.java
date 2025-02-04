@@ -3,12 +3,14 @@ package com.project.blog.controllers;
 import java.util.List;
 import java.util.Map;
 
+import com.project.blog.exceptions.ApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -79,7 +81,7 @@ public class UserController {
 
 
         } catch (BadCredentialsException e) {
-            throw new BadCredentialsException(" Invalid Username or Password  !!");
+            throw new ApiException(" Invalid Username or Password  !!");
         }
 
     }
@@ -102,13 +104,13 @@ public class UserController {
 		return ResponseEntity.ok(updatedUser);
 	}
 
-	
-	
+
+//Only admin can acccess this
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/{userId}")
-	public ResponseEntity<?> deleteUser(@PathVariable Integer userId){
-		this.userService.deleteUser(userId);
-//		return new ResponseEntity(Map.of("message", "User deleted Successfully"), HttpStatus.OK);
-		return new ResponseEntity(new ApiResponse("User deleted successfully", true), HttpStatus.OK);
+	public ResponseEntity<ApiResponse> deleteUser(@PathVariable("userId") Integer uid) {
+		this.userService.deleteUser(uid);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("User deleted Successfully", true), HttpStatus.OK);
 	}
 	
 	
