@@ -3,6 +3,7 @@ package com.project.blog.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -36,23 +37,28 @@ public class SecurityConfig {
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-	
-	
+
+
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-	    http.csrf(csrf -> csrf.disable())
-	        .authorizeHttpRequests(auth -> auth
-	            // Specific endpoints must be matched before broader patterns
-	            .requestMatchers("/api/users/login", "/api/verify/**").permitAll()
-	            .requestMatchers("/api/users/create").permitAll()
-	            .requestMatchers("/api/**", "/api/categories/**").authenticated()
-	            .anyRequest().authenticated()
-	        )
-	        .exceptionHandling(ex -> ex.authenticationEntryPoint(point))
-	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+		http.csrf(csrf -> csrf.disable()) // CSRF disabled because JWT is used for stateless authentication
+				.authorizeHttpRequests(auth -> auth
+						.requestMatchers(
+								"/api/users/login",
+								"/api/verify/**",
+								"/api/users/register",
+								"/api/users/create"
+						).permitAll()
+						.requestMatchers(HttpMethod.GET).permitAll() // Allow all GET requests
+						.anyRequest().authenticated() // All other requests require authentication
+				)
+				.exceptionHandling(ex -> ex.authenticationEntryPoint(point)) // Handle unauthorized access
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Stateless session management
 
-	    http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
-	    return http.build();
+		// Add JWT filter before Spring Security's UsernamePasswordAuthenticationFilter
+		http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+
+		return http.build();
 	}
 
 	 
