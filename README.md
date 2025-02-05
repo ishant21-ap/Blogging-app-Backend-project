@@ -30,5 +30,4 @@ This is the backend code for the **Blogging Application**, built using **Spring 
 
 ---
 
-## 📂 Project Structure
 
