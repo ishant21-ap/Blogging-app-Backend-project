@@ -12,6 +12,7 @@ This is the backend code for the **Blogging Application**, built using **Spring 
 - **CRUD Operations on Posts**: 
   - Create, Read, Update, and Delete posts.
   - Add images to posts.
+  - Search Post.
 - **Exception Handling**: Global exception handling for consistent and informative error responses.
 - **Data Transfer Objects (DTOs)**: Clean separation of entity models and client-facing data.
 - **Spring Security**: Secures APIs with authentication and authorization.
